@@ -45,7 +45,7 @@ body {
 h1,
 h2,
 h3 {
-  color: var(--headings-color);
+  color: var(--primary-color);
   margin-bottom: 0.625rem;
   line-height: 1.1;
 }
