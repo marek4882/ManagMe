@@ -8,7 +8,7 @@ function NavBar() {
       <header>
         <nav className="nav collapsible">
           <a className="nav__brand" href="/">
-            <img src="src\assets\react.svg"  alt="" />
+            <img src="src\assets\react.svg" alt="" />
           </a>
           <svg className="icon icon--white nav__toggler">
             <use xlinkHref="./assets/sprite.svg#menu"></use>
@@ -20,7 +20,6 @@ function NavBar() {
             <li className="nav__item">
               <a href="/project">Project</a>
             </li>
-            
             <li className="nav__item">
               <Button></Button>
             </li>
