@@ -1,5 +1,6 @@
 :root {
   --primary-color: #0a0a0a;
+  --primary-color-hover: #343434;
   --body-color: #363636;
   --accent-color: #b76d5e;
   --border-color: #ccc;
@@ -16,6 +17,7 @@
   --bg-status-doing-color: #f6fafc;
   --status-done-color: #deecdc;
   --bg-status-done-color: #f8faf7;
+  --button-color: #fff;
 }
 
 *,
@@ -78,3 +80,214 @@ p {
   }
 }
 
+/* links */
+a {
+  text-decoration: none;
+}
+/* Lists */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.list--inline .list__item {
+  display: inline-block;
+  margin-right: 1.25rem;
+}
+/* Buttons */
+.btn {
+  cursor: pointer;
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-align: center;
+  margin: 0.625rem 0;
+  padding: 1rem 4vw;
+  border: 0;
+  outline: 0;
+  border-radius: 30px;
+}
+
+.btn--accent {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+.btn--accent:hover {
+  background: #b76d5e;
+}
+.btn--outline {
+  background: #fff;
+  color: var(--headings-color);
+  border: 2px solid var(--headings-color);
+}
+.btn--outline:hover {
+  background: var(--headings-color);
+  color: #fff;
+}
+.btn--stretched {
+  padding-left: 3.75rem;
+  padding-right: 3.75rem;
+}
+.btn--block {
+  width: 100%;
+  display: inline-block;
+}
+@media screen and (min-width: 1024px) {
+  .btn {
+    font-size: 0.9375rem;
+  }
+}
+
+/* Inputs */
+.input {
+  font-size: 1.25rem;
+  padding: 0.9375rem 2.1875rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  outline: 0;
+  color: var(--headings-color);
+}
+::placeholder {
+  color: #cdcbd7;
+}
+.input-group {
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 20px 20px rgba(194, 196, 196, 0.26);
+}
+.input-group .input {
+  border: 0;
+  flex-grow: 1;
+  padding: 0.9375rem 1.25rem;
+  width: 0;
+}
+.input-group .btn {
+  z-index: 0;
+  margin: 4px;
+}
+
+@media screen and (min-width: 1024px) {
+  .input {
+    font-size: 0.9375rem;
+  }
+}
+
+/* Navigation Bar */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0 0.625rem;
+  margin: 1rem 0 0 0;
+}
+.nav__list {
+  margin: 0;
+  width: 100%;
+}
+.nav__item {
+  padding: 0.3125rem 1.25rem;
+  border-bottom: 1px solid #222;
+}
+
+.nav__item > a {
+  color: var(--primary-color);
+  transition: color 0.3s;
+}
+.nav__item > a:hover {
+  color: var(--primary-color-hover);
+}
+.nav__item > .btn--accent{
+  color: var(--button-color)
+}
+.nav__item > .btn--accent:hover{
+  color: var(--button-color)
+}
+.nav__toggler {
+  opacity: 0.5;
+}
+.nav__toggler {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: box-shadow 0.15s;
+}
+.nav.collapsible--expanded .nav__toggler {
+  opacity: 1;
+  box-shadow: 0 0 0 3px #666;
+  border-radius: 5px;
+}
+
+.nav__brand {
+  transform: translate(5px);
+}
+@media screen and (min-width: 768px) {
+  .nav__toggler {
+    display: none;
+  }
+  .nav__list {
+    width: auto;
+    display: flex;
+    font-size: 1rem;
+    max-height: 100%;
+    opacity: 1;
+  }
+  .nav__item {
+    border: 0;
+  }
+}
+
+/* Grids */
+.grid {
+  display: grid;
+}
+@media screen and (min-width: 768px) {
+  .grid--1x2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (min-width: 1024px) {
+  .grid--1x3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+/* Hero */
+.hero__tagline {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  letter-spacing: 1px;
+  margin: 1.25rem 0 2rem;
+}
+.hero__image {
+  width: 100%;
+}
+.hero__image-container {
+  justify-content: center;
+  align-items: center;
+}
+@media screen and (min-width: 768px) {
+  .hero {
+    padding-top: 0;
+  }
+  .hero__content {
+    text-align: left !important;
+    align-self: center;
+  }
+}
+/* Blocks */
+.block {
+  --padding-vertical: 3rem;
+  padding: var(--padding-vertical) 1.25rem;
+}
+.block__header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+.block__heading {
+  margin-top: 0;
+}
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+}
