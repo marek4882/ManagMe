@@ -18,6 +18,10 @@ function NavBar() {
               <a href="/">Home</a>
             </li>
             <li className="nav__item">
+              <a href="/project">Project</a>
+            </li>
+            
+            <li className="nav__item">
               <Button></Button>
             </li>
           </ul>
