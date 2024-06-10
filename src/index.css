@@ -199,11 +199,11 @@ ul {
 .nav__item > a:hover {
   color: var(--primary-color-hover);
 }
-.nav__item > .btn--accent{
-  color: var(--button-color)
+.nav__item > .btn--accent {
+  color: var(--button-color);
 }
-.nav__item > .btn--accent:hover{
-  color: var(--button-color)
+.nav__item > .btn--accent:hover {
+  color: var(--button-color);
 }
 .nav__toggler {
   opacity: 0.5;
@@ -290,4 +290,45 @@ ul {
 .container {
   max-width: 1140px;
   margin: 0 auto;
+}
+
+/* Forms */
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  gap:5rem;
+}
+
+.form-signin {
+  max-width: 400px;
+  text-align: center;
+  width: 100%;
+}
+.form-group {
+  margin: 1rem 0;
+}
+.form-control {
+  border: 1px solid #ced4da;
+  outline: 0;
+}
+.form-control:focus {
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 0 0 5px var(--accent-color);
+}
+
+.form-control {
+  border-radius: 5px;
+  padding: 1rem;
+  width: 100%;
+}
+.btn--form {
+  width: 100%;
+}
+
+.muted {
+  color: #6c757d;
 }

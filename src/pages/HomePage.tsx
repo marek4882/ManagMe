@@ -1,5 +1,5 @@
 import Button from "../components/Button";
-import heroImage from "../assets/hero-image.svg"; // Correct way to import images in React
+import heroImage from "../assets/hero-image.svg"; 
 
 function HomePage() {
   return (

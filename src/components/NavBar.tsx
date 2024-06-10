@@ -15,7 +15,7 @@ function NavBar() {
           </svg>
           <ul className="list nav__list collapsible__content">
             <li className="nav__item">
-              <a href="#">Home</a>
+              <a href="/">Home</a>
             </li>
             <li className="nav__item">
               <Button></Button>
