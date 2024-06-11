@@ -113,50 +113,63 @@ export class ProjectManager {
     this.repository.setCurrentProject(id);
   }
   public getCurrentStory(): Story | null{
-    const currentStoryId = this.repository.getCurrentProjectId();
+    const currentStoryId = this.repository.getCurrentStoryId();
     if (currentStoryId){
       return this.repository.readStories().find(story => story.id === currentStoryId) || null
     }
     return null
   }
   // Task
-  public addTask(name: string, description: string, storyId: string, assigneeId: string): void {
-    const tasks = this.repository.readTasks();
-    const task: Task = {
-      id: uuid(),
-      name,
-      description,
-      projectId: this.repository.getCurrentProjectId() || "",
-      storyId,
-      assigneeId,
-      status: "Todo",
-      startDate: undefined,
-      endDate: undefined,
-      hoursWorked: 0,
-    };
-    tasks.push(task);
-    this.repository.saveTasks(tasks);
+public addTask(name: string, description: string, priority: "Low" | "Medium" | "High", state: "Todo" | "Doing" | "Done", estimatedTime: number,userId: string): void {
+  const currentStoryId = this.repository.getCurrentStoryId();
+
+  if (!currentStoryId) {
+    console.error("No current project or story selected.");
+    return;
   }
 
+  const tasks = this.repository.readTasks();
+  const task: Task = {
+    id: uuid(),
+    name,
+    description,
+    priority,
+    storyId: this.repository.getCurrentStoryId() || "",
+    estimatedTime,
+    state,
+    startDate: new Date(),
+    endDate: new Date(),
+    userId,
+  };
+  tasks.push(task);
+  this.repository.saveTasks(tasks);
+}
+
+
   public readTasks(): Task[] {
-    return this.repository.readTasks().filter(task => task.projectId === this.getCurrentProject()?.id);
+    return this.repository.readTasks().filter(task => task.storyId === this.getCurrentStory()?.id);
   }
+  
 
   public readTask(id: string): Task | null {
     const tasks = this.repository.readTasks();
     return tasks.find((task) => task.id === id) || null;
   }
 
-  public updateTask(id: string, updatedTask: Partial<Task>): boolean {
+  public updateTask(id: string, newName: string, newDescription: string, newPriority: "Low" | "Medium" | "High", newState: "Todo" | "Doing" | "Done"): boolean {
     const tasks = this.repository.readTasks();
     const index = tasks.findIndex((task) => task.id === id);
     if (index !== -1) {
-      tasks[index] = { ...tasks[index], ...updatedTask };
+      tasks[index].name = newName;
+      tasks[index].description = newDescription;
+      tasks[index].priority = newPriority;
+      tasks[index].state = newState;
       this.repository.saveTasks(tasks);
       return true;
     }
     return false;
   }
+  
 
   public deleteTask(id: string): boolean {
     const tasks = this.repository.readTasks();

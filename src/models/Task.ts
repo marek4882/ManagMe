@@ -1,5 +1,4 @@
 export interface Task{
-    projectId: string | undefined;
     id: string;
     name: string;
     description: string;

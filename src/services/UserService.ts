@@ -11,8 +11,11 @@ export class UserService {
     public static setCurrentUser(user: User): void {
       localStorage.setItem(UserService.currentUserKey, JSON.stringify(user));
     }
+    public static getAllMockUsers(): User[] {
+      return mockUsers;
+    }
   }
   
-  UserService.setCurrentUser(mockUsers[0]);
+  UserService.setCurrentUser(mockUsers[2]);
 
 
