@@ -1,133 +1,172 @@
 import { LocalRepository, Repository } from "../api/ApiService";
 import { Project } from "../models/Project";
+import { Story } from "../models/Story";
 import { v4 as uuid } from "uuid";
+import { Task } from "../models/Task";
 
 export class ProjectManager {
-    private repository: Repository;
-  
-    constructor(repository: Repository) {
-      this.repository = repository;
-    }
-  
-    public add(name: string, description: string): void {
-      const projects = this.repository.readProjects();
-      const project: Project = {
-        id: uuid(),
-        name,
-        description,
-      };
-      projects.push(project);
-      this.repository.saveProjects(projects);
-    }
-  
-    public read(): Project[] {
-      return this.repository.readProjects();
-    }
-  
-    public update(id: string, newName: string, newDescription: string): boolean {
-      const projects = this.repository.readProjects();
-      const index = projects.findIndex((project) => project.id === id);
-      if (index !== -1) {
-        projects[index].name = newName;
-        projects[index].description = newDescription;
-        this.repository.saveProjects(projects);
-        return true;
-      }
-      return false;
-    }
-  
-    public delete(id: string): boolean {
-      const projects = this.repository.readProjects();
-      const initialLength = projects.length;
-      const updatedProjects = projects.filter((project) => project.id !== id);
-      if (updatedProjects.length !== initialLength) {
-        this.repository.saveProjects(updatedProjects);
-        return true;
-      }
-      return false;
-    }
+  private repository: Repository;
+
+  constructor(repository: Repository) {
+    this.repository = repository;
   }
-  
-  document.addEventListener("DOMContentLoaded", () => {
-    const projectManager = new ProjectManager(new LocalRepository());
-  
-    const form = document.querySelector<HTMLFormElement>("form")!;
-    form.addEventListener("submit", (event: Event) => {
-      event.preventDefault();
-      const projectNameInput =
-        document.querySelector<HTMLInputElement>("#projectName")!;
-      const projectDescriptionInput = document.querySelector<HTMLTextAreaElement>(
-        "#projectDescription"
-      )!;
-  
-      const projectName = projectNameInput.value.trim();
-      const projectDescription = projectDescriptionInput.value.trim();
-  
-      if (projectName && projectDescription) {
-        projectManager.add(projectName, projectDescription);
-        projectNameInput.value = "";
-        projectDescriptionInput.value = "";
-        refreshProjectList();
-      }
-    });
-  
-    function refreshProjectList(): void {
-      const projectListContainer =
-        document.querySelector<HTMLDivElement>("#projectList")!;
-      const projects = projectManager.read();
-      projectListContainer.innerHTML = "";
-      projects.forEach((project) => {
-        const projectElement = document.createElement("div");
-        projectElement.innerHTML = `
-          <h3>${project.name}</h3>
-          <p>${project.description}</p>
-          <button class="edit-btn" data-id="${project.id}">Edytuj</button>
-          <button class="delete-btn" data-id="${project.id}">Usuń</button>
-        `;
-        projectListContainer.appendChild(projectElement);
-      });
-  
-      const editButtons = document.querySelectorAll<HTMLButtonElement>(".edit-btn");
-      editButtons.forEach(button => {
-        button.addEventListener("click", () => {
-          const projectId = button.dataset.id!;
-          editProject(projectId);
-        });
-      });
-  
-      const deleteButtons = document.querySelectorAll<HTMLButtonElement>(".delete-btn");
-      deleteButtons.forEach(button => {
-        button.addEventListener("click", () => {
-          const projectId = button.dataset.id!;
-          deleteProject(projectId);
-        });
-      });
+
+  // Project Management Methods
+  public addProject(name: string, description: string): void {
+    const projects = this.repository.readProjects();
+    const project: Project = {
+      id: uuid(),
+      name,
+      description,
+    };
+    projects.push(project);
+    this.repository.saveProjects(projects);
+  }
+
+  public readProjects(): Project[] {
+    return this.repository.readProjects();
+  }
+
+  public updateProject(id: string, newName: string, newDescription: string): boolean {
+    const projects = this.repository.readProjects();
+    const index = projects.findIndex((project) => project.id === id);
+    if (index !== -1) {
+      projects[index].name = newName;
+      projects[index].description = newDescription;
+      this.repository.saveProjects(projects);
+      return true;
     }
-  
-    function editProject(id: string): void {
-      const newName = prompt("Nowa nazwa projektu:");
-      const newDescription = prompt("Nowy opis projektu:");
-      if (newName !== null && newDescription !== null) {
-        const updated = projectManager.update(id, newName, newDescription);
-        if (updated) {
-          refreshProjectList();
-        } else {
-          alert(
-            "Nie można zaktualizować projektu - projekt o podanym ID nie istnieje."
-          );
-        }
-      }
+    return false;
+  }
+
+  public deleteProject(id: string): boolean {
+    const projects = this.repository.readProjects();
+    const initialLength = projects.length;
+    const updatedProjects = projects.filter((project) => project.id !== id);
+    if (updatedProjects.length !== initialLength) {
+      this.repository.saveProjects(updatedProjects);
+      return true;
     }
-  
-    function deleteProject(id: string): void {
-      const deleted = projectManager.delete(id);
-      if (deleted) {
-        refreshProjectList();
-      } else {
-        alert("Nie można usunąć projektu - projekt o podanym ID nie istnieje.");
-      }
+    return false;
+  }
+
+  public setCurrentProject(id: string): void {
+    this.repository.setCurrentProject(id);
+  }
+
+  public getCurrentProject(): Project | null {
+    const currentProjectId = this.repository.getCurrentProjectId();
+    if (currentProjectId) {
+      return this.repository.readProjects().find(project => project.id === currentProjectId) || null;
     }
-  
-    refreshProjectList();
-  });
-  
+    return null;
+  }
+
+
+  // Story Management Methods
+  public addStory(name: string, description: string, priority: "Low" | "Medium" | "High", status: "Todo" | "Doing" | "Done", ownerId: string): void {
+    const stories = this.repository.readStories();
+    const story: Story = {
+      id: uuid(),
+      name,
+      description,
+      priority,
+      projectId: this.repository.getCurrentProjectId() || "",
+      creationDate: new Date(),
+      status,
+      ownerId,
+    };
+    stories.push(story);
+    console.log(stories);
+    this.repository.saveStories(stories);
+  }
+
+  public readStories(): Story[] {
+    return this.repository.readStories().filter(story => story.projectId === this.getCurrentProject()?.id);
+  }
+
+  public updateStory(id: string, newName: string, newDescription: string, newPriority: "Low" | "Medium" | "High", newStatus: "Todo" | "Doing" | "Done"): boolean {
+    const stories = this.repository.readStories();
+    const index = stories.findIndex((story) => story.id === id);
+    if (index !== -1) {
+      stories[index].name = newName;
+      stories[index].description = newDescription;
+      stories[index].priority = newPriority;
+      stories[index].status = newStatus;
+      this.repository.saveStories(stories);
+      return true;
+    }
+    return false;
+  }
+
+  public deleteStory(id: string): boolean {
+    const stories = this.repository.readStories();
+    const initialLength = stories.length;
+    const updatedStories = stories.filter((story) => story.id !== id);
+    if (updatedStories.length !== initialLength) {
+      this.repository.saveStories(updatedStories);
+      return true;
+    }
+    return false;
+  }
+  public setCurrentStory(id:string):void{
+    this.repository.setCurrentProject(id);
+  }
+  public getCurrentStory(): Story | null{
+    const currentStoryId = this.repository.getCurrentProjectId();
+    if (currentStoryId){
+      return this.repository.readStories().find(story => story.id === currentStoryId) || null
+    }
+    return null
+  }
+  // Task
+  public addTask(name: string, description: string, storyId: string, assigneeId: string): void {
+    const tasks = this.repository.readTasks();
+    const task: Task = {
+      id: uuid(),
+      name,
+      description,
+      projectId: this.repository.getCurrentProjectId() || "",
+      storyId,
+      assigneeId,
+      status: "Todo",
+      startDate: undefined,
+      endDate: undefined,
+      hoursWorked: 0,
+    };
+    tasks.push(task);
+    this.repository.saveTasks(tasks);
+  }
+
+  public readTasks(): Task[] {
+    return this.repository.readTasks().filter(task => task.projectId === this.getCurrentProject()?.id);
+  }
+
+  public readTask(id: string): Task | null {
+    const tasks = this.repository.readTasks();
+    return tasks.find((task) => task.id === id) || null;
+  }
+
+  public updateTask(id: string, updatedTask: Partial<Task>): boolean {
+    const tasks = this.repository.readTasks();
+    const index = tasks.findIndex((task) => task.id === id);
+    if (index !== -1) {
+      tasks[index] = { ...tasks[index], ...updatedTask };
+      this.repository.saveTasks(tasks);
+      return true;
+    }
+    return false;
+  }
+
+  public deleteTask(id: string): boolean {
+    const tasks = this.repository.readTasks();
+    const initialLength = tasks.length;
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    if (updatedTasks.length !== initialLength) {
+      this.repository.saveTasks(updatedTasks);
+      return true;
+    }
+    return false;
+  }
+}
+

@@ -6,8 +6,11 @@
   --border-color: #ccc;
   --border-radius: 30px;
   --edit-color: #b7a95e;
+  --edit-color-hover:#d0c16b;
   --delete-color: #c34949;
+  --delete-color-hover:#ec4b4b;
   --open-color: #636363;
+  --open-color-hover: #737373;
   --low-priority-color: #00ac46;
   --medium-priority-color: #fdc500;
   --high-priority-color: #dc0000;
@@ -102,8 +105,8 @@ ul {
   text-transform: uppercase;
   white-space: nowrap;
   text-align: center;
-  margin: 0.625rem 0;
-  padding: 1rem 4vw;
+  margin: 0.625rem 0.2rem;
+  padding: 0.8rem 4vw;
   border: 0;
   outline: 0;
   border-radius: 30px;
@@ -113,8 +116,9 @@ ul {
   background-color: var(--accent-color);
   color: #fff;
 }
-.btn--accent:hover {
-  background: #b76d5e;
+.btn--accent:hover,
+.btn--accent:focus {
+  background: #d67865;
 }
 .btn--outline {
   background: #fff;
@@ -132,6 +136,31 @@ ul {
 .btn--block {
   width: 100%;
   display: inline-block;
+}
+.btn--edit{
+  background-color: var(--edit-color);
+  color:#0a0a0a;
+}
+.btn--edit:hover,
+.btn--edit:focus{
+  background-color: var(--edit-color-hover);
+}
+.btn--delete{
+  background-color: var(--delete-color);
+  color:#0a0a0a;
+}
+.btn--delete:hover,
+.btn--delete:focus{
+  background-color: var(--delete-color-hover);
+}
+.btn--open{
+  background-color: var(--open-color);
+  color: #ffffff;
+}
+.btn--open:hover,
+.btn--open:focus{
+  background-color: var(--open-color-hover);
+  color: #ffffff;
 }
 @media screen and (min-width: 1024px) {
   .btn {
@@ -331,4 +360,33 @@ ul {
 
 .muted {
   color: #6c757d;
+}
+
+/* Projects, Story, Task */
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  border-radius: 15px;
+  background-color: #f9f9f9;
+}
+
+.flex h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  flex-grow: 1;
+}
+.flex p {
+  margin: 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #666;
+  flex-grow: 2;
+}
+.flex .btn{
+  font-size: 1rem;
 }

@@ -1,16 +1,13 @@
-import { Story } from "./Story";
-import { User } from "./User";
-
 export interface Task{
+    projectId: string | undefined;
     id: string;
     name: string;
     description: string;
     priority: "Low" | "Medium" | "High";
-    story: Story;
+    storyId: string;
     estimatedTime: number;
     state: "Todo" | "Doing" | "Done";
-    creationDate: Date;
-    startDate?: Date;
-    endDate?: Date;
-    user?: User;
+    startDate?: Date | undefined; 
+    endDate?: Date | undefined;
+    userId: string;
 }
