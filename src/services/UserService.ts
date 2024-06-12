@@ -16,6 +16,6 @@ export class UserService {
     }
   }
   
-  UserService.setCurrentUser(mockUsers[2]);
+  UserService.setCurrentUser(mockUsers[0]);
 
 

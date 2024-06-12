@@ -27,7 +27,11 @@ export class ProjectManager {
     return this.repository.readProjects();
   }
 
-  public updateProject(id: string, newName: string, newDescription: string): boolean {
+  public updateProject(
+    id: string,
+    newName: string,
+    newDescription: string
+  ): boolean {
     const projects = this.repository.readProjects();
     const index = projects.findIndex((project) => project.id === id);
     if (index !== -1) {
@@ -57,14 +61,23 @@ export class ProjectManager {
   public getCurrentProject(): Project | null {
     const currentProjectId = this.repository.getCurrentProjectId();
     if (currentProjectId) {
-      return this.repository.readProjects().find(project => project.id === currentProjectId) || null;
+      return (
+        this.repository
+          .readProjects()
+          .find((project) => project.id === currentProjectId) || null
+      );
     }
     return null;
   }
 
-
   // Story Management Methods
-  public addStory(name: string, description: string, priority: "Low" | "Medium" | "High", status: "Todo" | "Doing" | "Done", ownerId: string): void {
+  public addStory(
+    name: string,
+    description: string,
+    priority: "Low" | "Medium" | "High",
+    status: "Todo" | "Doing" | "Done",
+    ownerId: string
+  ): void {
     const stories = this.repository.readStories();
     const story: Story = {
       id: uuid(),
@@ -82,10 +95,18 @@ export class ProjectManager {
   }
 
   public readStories(): Story[] {
-    return this.repository.readStories().filter(story => story.projectId === this.getCurrentProject()?.id);
+    return this.repository
+      .readStories()
+      .filter((story) => story.projectId === this.getCurrentProject()?.id);
   }
 
-  public updateStory(id: string, newName: string, newDescription: string, newPriority: "Low" | "Medium" | "High", newStatus: "Todo" | "Doing" | "Done"): boolean {
+  public updateStory(
+    id: string,
+    newName: string,
+    newDescription: string,
+    newPriority: "Low" | "Medium" | "High",
+    newStatus: "Todo" | "Doing" | "Done"
+  ): boolean {
     const stories = this.repository.readStories();
     const index = stories.findIndex((story) => story.id === id);
     if (index !== -1) {
@@ -109,54 +130,66 @@ export class ProjectManager {
     }
     return false;
   }
-  public setCurrentStory(id:string):void{
-    this.repository.setCurrentProject(id);
+  public setCurrentStory(id: string): void {
+    this.repository.setCurrentStory(id);
   }
-  public getCurrentStory(): Story | null{
+  public getCurrentStory(): Story | null {
     const currentStoryId = this.repository.getCurrentStoryId();
-    if (currentStoryId){
-      return this.repository.readStories().find(story => story.id === currentStoryId) || null
+    if (currentStoryId) {
+      return (
+        this.repository
+          .readStories()
+          .find((story) => story.id === currentStoryId) || null
+      );
     }
-    return null
+    return null;
   }
   // Task
-public addTask(name: string, description: string, priority: "Low" | "Medium" | "High", state: "Todo" | "Doing" | "Done", estimatedTime: number,userId: string): void {
-  const currentStoryId = this.repository.getCurrentStoryId();
 
-  if (!currentStoryId) {
-    console.error("No current project or story selected.");
-    return;
+  public addTask(
+    name: string,
+    description: string,
+    priority: "Low" | "Medium" | "High",
+    state: "Todo" | "Doing" | "Done",
+    estimatedTime: number,
+    userId: string
+  ): void {
+    const tasks = this.repository.readTasks();
+    const task: Task = {
+      id: uuid(),
+      name,
+      description,
+      priority,
+      storyId: this.repository.getCurrentStoryId() || "",
+      estimatedTime,
+      state,
+      startDate: new Date(),
+      endDate: new Date(),
+      userId,
+    };
+    tasks.push(task);
+    console.log(task);
+    this.repository.saveTasks(tasks);
   }
-
-  const tasks = this.repository.readTasks();
-  const task: Task = {
-    id: uuid(),
-    name,
-    description,
-    priority,
-    storyId: this.repository.getCurrentStoryId() || "",
-    estimatedTime,
-    state,
-    startDate: new Date(),
-    endDate: new Date(),
-    userId,
-  };
-  tasks.push(task);
-  this.repository.saveTasks(tasks);
-}
-
 
   public readTasks(): Task[] {
-    return this.repository.readTasks().filter(task => task.storyId === this.getCurrentStory()?.id);
+    return this.repository
+      .readTasks()
+      .filter((task) => task.storyId === this.getCurrentStory()?.id);
   }
-  
 
   public readTask(id: string): Task | null {
     const tasks = this.repository.readTasks();
     return tasks.find((task) => task.id === id) || null;
   }
 
-  public updateTask(id: string, newName: string, newDescription: string, newPriority: "Low" | "Medium" | "High", newState: "Todo" | "Doing" | "Done"): boolean {
+  public updateTask(
+    id: string,
+    newName: string,
+    newDescription: string,
+    newPriority: "Low" | "Medium" | "High",
+    newState: "Todo" | "Doing" | "Done"
+  ): boolean {
     const tasks = this.repository.readTasks();
     const index = tasks.findIndex((task) => task.id === id);
     if (index !== -1) {
@@ -169,7 +202,6 @@ public addTask(name: string, description: string, priority: "Low" | "Medium" | "
     }
     return false;
   }
-  
 
   public deleteTask(id: string): boolean {
     const tasks = this.repository.readTasks();
@@ -181,5 +213,17 @@ public addTask(name: string, description: string, priority: "Low" | "Medium" | "
     }
     return false;
   }
+  public setCurrentTask(id: string): void {
+    this.repository.setCurrentTask(id);
+  }
+  public getCurrentTask(): Task | null {
+    const currentTaskId = this.repository.getCurrentTaskId();
+    if (currentTaskId) {
+      return (
+        this.repository.readTasks().find((task) => task.id === currentTaskId) ||
+        null
+      );
+    }
+    return null;
+  }
 }
-
