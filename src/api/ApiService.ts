@@ -13,6 +13,8 @@ export interface Repository {
   getCurrentProjectId(): string | null;
   setCurrentStory(id: string): void;
   getCurrentStoryId(): string | null;
+  setCurrentTask(id: string): void;
+  getCurrentTaskId(): string | null;
 }
 
 export class LocalRepository implements Repository {
@@ -20,7 +22,8 @@ export class LocalRepository implements Repository {
   private static readonly storiesStorageKey = "stories";
   private static readonly tasksStorageKey = "tasks";
   private static readonly currentProjectKey = "currentProject";
-  private static readonly currentStoryKey = "currentStory"; // New
+  private static readonly currentStoryKey = "currentStory";
+  private static readonly currentTaskKey = "currentTask";
 
   public readProjects(): Project[] {
     const projectsData = localStorage.getItem(
@@ -56,11 +59,12 @@ export class LocalRepository implements Repository {
     return localStorage.getItem(LocalRepository.currentProjectKey);
   }
 
-  public setCurrentStory(id: string): void { // New method
+
+  public setCurrentStory(id: string): void {
     localStorage.setItem(LocalRepository.currentStoryKey, id);
   }
 
-  public getCurrentStoryId(): string | null { // New method
+  public getCurrentStoryId(): string | null { 
     return localStorage.getItem(LocalRepository.currentStoryKey);
   }
 
@@ -74,5 +78,11 @@ export class LocalRepository implements Repository {
       LocalRepository.tasksStorageKey,
       JSON.stringify(tasks)
     );
+  }
+  public setCurrentTask(id: string): void {
+    localStorage.setItem(LocalRepository.currentTaskKey, id);
+  }
+  public getCurrentTaskId(): string | null {
+    return localStorage.getItem(LocalRepository.currentTaskKey)
   }
 }
