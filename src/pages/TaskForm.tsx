@@ -1,109 +1,237 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Task } from "../models/Task";
 import { ProjectManager } from "../services/ProjectService";
 import { LocalRepository } from "../api/ApiService";
-import { UserService} from "../services/UserService";
+import { UserService } from "../services/UserService";
 import { mockUsers } from "../models/User";
 
-interface TaskDetailsProps {
-  taskId: string; 
+interface TaskFormProps {
+  story: {
+    id: string;
+    name: string;
+  };
 }
 
-const TaskDetails: React.FC<TaskDetailsProps> = ({ taskId }) => {
-  const [task, setTask] = useState<Task[]>([]);
+const TaskForm: React.FC<TaskFormProps> = ({ story }) => {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Low");
-  const [estimatedTime, setEstimatedTime] = useState(0);
-  const [state, setStatus] = useState<"Todo" | "Doing" | "Done">("Todo");
+  const [estimatedTime, setEstimatedTime] = useState(1);
+  const [state, setState] = useState<"Todo" | "Doing" | "Done">("Todo");
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
   const [assignee, setAssignee] = useState<string>("");
-  
-    useEffect(() =>{
-        refreshTaskList();
-    },[]);
-  const projectManager = new ProjectManager(new LocalRepository());
-  const allUsers = UserService.getAllMockUsers();
 
-const handleAddOrUpdateStory = (event: React.FormEvent) =>{
+  const projectManager = new ProjectManager(new LocalRepository());
+
+  useEffect(() => {
+    refreshTaskList();
+  }, [story]);
+
+  const handleAddOrUpdateTask = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if(taskName && taskDescription && priority && status){
-        if(editTaskId){
-            const updated = projectManager.updateTask(editTaskId, taskName, taskDescription, priority, state)
-            console.log("Task updated: ", updated);
-        }else{
-            projectManager.addTask(taskName, taskDescription, priority, state, estimatedTime, allUsers? );
-        }
-        setTaskName("");
-        setTaskDescription("");
-        setPriority("Low");
-        setStatus("Todo");
-        setEditTaskId(null);
-        refreshTaskList();
-    }
-}
+    if (taskName && taskDescription && priority && state && assignee) {
+      if (editTaskId) {
+        const updated = projectManager.updateTask(
+          editTaskId,
+          taskName,
+          taskDescription,
+          priority,
+          state
+        );
+        console.log("Task updated: ", updated);
+      } else {
+        
+        const newState = assignee ? "Doing" : "Todo";
 
-    const refreshTaskList = () => {
-        const tasks = projectManager.readTasks();
-        setTask(tasks);
-        console.log("Task refreshed: ", tasks)
-    }
-
-  const handleAssigneeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newAssignee = e.target.value;
-    setAssignee(newAssignee);
-    if (task) {
-      projectManager.updateTask(task.id, {
-        assigneeId: newAssignee,
-        status: "Doing",
-        startDate: new Date(),
-      });
-      setTask({ ...task, assigneeId: newAssignee, status: "Doing", startDate: new Date() });
-    }
-  };
-
-  const handleStatusChange = () => {
-    if (task) {
-      const newStatus = task.status === "Doing" ? "Done" : task.status;
-      projectManager.updateTask(task.id, {
-        status: newStatus,
-        endDate: newStatus === "Done" ? new Date() : null,
-      });
-      setTask({ ...task, status: newStatus, endDate: newStatus === "Done" ? new Date() : null });
+        projectManager.addTask(
+          taskName,
+          taskDescription,
+          priority,
+          newState, 
+          estimatedTime,
+          assignee
+        );
+      }
+      setTaskName("");
+      setTaskDescription("");
+      setPriority("Low");
+      setState("Todo");
+      setEstimatedTime(1);
+      setAssignee("");
+      setEditTaskId(null);
+      refreshTaskList();
     }
   };
 
-  if (!task) return <div>Loading...</div>;
+  const refreshTaskList = () => {
+    const tasks = projectManager.readTasks();
+    setTasks(tasks.filter((task) => task.storyId === story.id));
+    console.log("Tasks refreshed: ", tasks);
+  };
+
+  const handleEditTask = (taskId: string) => {
+    const task = projectManager.readTask(taskId);
+    if (task) {
+      setTaskName(task.name);
+      setTaskDescription(task.description);
+      setPriority(task.priority);
+      setState(task.state);
+      setEstimatedTime(task.estimatedTime);
+      setAssignee(task.userId);
+      setEditTaskId(task.id);
+    }
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    projectManager.deleteTask(taskId);
+    refreshTaskList();
+  };
 
   return (
-    <div>
-      <h1>Task Details</h1>
-      <p>Name: {task[0].name}</p>
-      <p>Description: {task[0].description}</p>
-      <p>Project ID: {task[0].projectId}</p>
-      <p>Status: {task[0].state}</p>
-      <p>Start Date: {task[0].startDate?.toString()}</p>
-      <p>End Date: {task[0].endDate?.toString()}</p>
-      <p>Assignee: {task[0].userId}</p>
-      <div>
-        <label>Assignee: </label>
-        <select value={assignee} onChange={handleAssigneeChange}>
-          <option value="">Select Assignee</option>
-          {allUsers
-            .filter(user => user.role === "Devops" || user.role === "Developer")
-            .map(user => (
-              <option key={user.id} value={user.id}>
-                {user.name} {user.surname} ({user.role})
+    <section className="block grid container">
+      <section className="form-container">
+        <form className="form-signin" onSubmit={handleAddOrUpdateTask}>
+          <h1>Add Task</h1>
+          <div className="form-group">
+            <input
+              className="form-control"
+              type="text"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              placeholder="Task Name"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <textarea
+              className="form-control"
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              placeholder="Description"
+              required
+            ></textarea>
+          </div>
+          <div className="form-group">
+            <label>Priority</label>
+            <select
+              className="form-control"
+              value={priority}
+              onChange={(e) =>
+                setPriority(e.target.value as "Low" | "Medium" | "High")
+              }
+            >
+              <option className="low-priority" value="Low">
+                Low
               </option>
-            ))}
-        </select>
+              <option className="medium-priority" value="Medium">
+                Medium
+              </option>
+              <option className="high-priority" value="High">
+                High
+              </option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Status</label>
+            <select
+              className="form-control"
+              value={state}
+              onChange={(e) =>
+                setState(e.target.value as "Todo" | "Doing" | "Done")
+              }
+            >
+              <option className="status-todo" value="Todo">
+                Todo
+              </option>
+              <option className="status-doing" value="Doing">
+                Doing
+              </option>
+              <option className="status-done" value="Done">
+                Done
+              </option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Estimated Time (hours)</label>
+            <input
+              className="form-control"
+              type="number"
+              value={estimatedTime}
+              onChange={(e) => setEstimatedTime(Number(e.target.value))}
+              placeholder="Estimated Time"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Assignee</label>
+            <select
+              className="form-control"
+              value={assignee}
+              onChange={(e) => setAssignee(e.target.value)}
+            >
+              <option value="">Select Assignee</option>
+              {mockUsers
+                .filter(
+                  (user) => user.role === "Devops" || user.role === "Developer"
+                )
+                .map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name} {user.surname} ({user.role})
+                  </option>
+                ))}
+            </select>
+          </div>
+          <button className="btn btn--accent btn--form" type="submit">
+            {editTaskId ? "Save Changes" : "Add"}
+          </button>
+        </form>
+      </section>
+      <div className="task-list">
+        {story && <h2>Tasks for Story: {story.name}</h2>}
+        {tasks.map((task) => (
+          <div key={task.id} className="flex">
+            <h3>{task.name}</h3>
+            <p>{task.description}</p>
+            <p>
+              Priority:
+              <span className={`btn ${task.priority.toLowerCase()}-priority`}>
+                {task.priority}
+              </span>{" "}
+            </p>
+            <p>
+              State:{" "}
+              <span className={`btn status-${task.state.toLowerCase()}`}>
+                {task.state}
+              </span>
+            </p>
+            <p>Estimated Time: {task.estimatedTime} hours</p>
+            <p>{task.state === "Doing"} Start Date: {task.startDate}</p>
+            {task.state === "Done" &&(
+              <p>
+                End Date:{" "}
+                {task.endDate ? task.endDate.toString() : "Not available"}
+              </p>
+            )}
+            <p>Assignee: {task.userId}</p>
+            <button
+              className="btn btn--edit"
+              onClick={() => handleEditTask(task.id)}
+            >
+              Edit
+            </button>
+            <button
+              className="btn btn--delete"
+              onClick={() => handleDeleteTask(task.id)}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
       </div>
-      {task[0].state !== "Done" && (
-        <button onClick={handleStatusChange}>Mark as Done</button>
-      )}
-    </div>
+    </section>
   );
 };
 
-export default TaskDetails;
+export default TaskForm;
