@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Task } from "../models/Task";
 import { ProjectManager } from "../services/ProjectService";
 import { LocalRepository } from "../api/ApiService";
-import { UserService } from "../services/UserService";
 import { mockUsers } from "../models/User";
 
 interface TaskFormProps {
@@ -42,14 +41,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ story }) => {
         );
         console.log("Task updated: ", updated);
       } else {
-        
         const newState = assignee ? "Doing" : "Todo";
 
         projectManager.addTask(
           taskName,
           taskDescription,
           priority,
-          newState, 
+          newState,
           estimatedTime,
           assignee
         );
@@ -207,8 +205,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ story }) => {
               </span>
             </p>
             <p>Estimated Time: {task.estimatedTime} hours</p>
-            <p>{task.state === "Doing"} Start Date: {task.startDate}</p>
-            {task.state === "Done" &&(
+            <p>
+              {task.state === "Doing"} Start Date: {task.startDate}
+            </p>
+            {task.state === "Done" && (
               <p>
                 End Date:{" "}
                 {task.endDate ? task.endDate.toString() : "Not available"}

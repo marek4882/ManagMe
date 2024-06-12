@@ -167,8 +167,20 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
             <div key={story.id} className="flex">
               <h3>{story.name}</h3>
               <p>{story.description}</p>
-              <p>Priority:<span className={`btn ${story.priority.toLowerCase()}-priority`}>{story.priority}</span> </p>
-              <p>Status: <span className={`btn status-${story.status.toLowerCase()}`}>{story.status}</span></p>
+              <p>
+                Priority:
+                <span
+                  className={`btn ${story.priority.toLowerCase()}-priority`}
+                >
+                  {story.priority}
+                </span>{" "}
+              </p>
+              <p>
+                Status:{" "}
+                <span className={`btn status-${story.status.toLowerCase()}`}>
+                  {story.status}
+                </span>
+              </p>
               <p>User: {story.ownerId}</p>
               <button
                 className="btn btn--edit"
