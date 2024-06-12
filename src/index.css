@@ -390,3 +390,38 @@ ul {
 .flex .btn{
   font-size: 1rem;
 }
+/* Priority Colors */
+
+option{
+  font-size: 1rem;
+}
+.low-priority {
+  background-color: var(--low-priority-color);
+  color: #fff;
+}
+
+.medium-priority {
+  background-color: var(--medium-priority-color);
+  color: #fff;
+}
+
+.high-priority {
+  background-color: var(--high-priority-color);
+  color: #fff;
+}
+
+/* Status Colors */
+.status-todo {
+  background-color: var(--status-todo-color);
+  color: #000000; /* You might need to adjust the text color */
+}
+
+.status-doing {
+  background-color: var(--status-doing-color);
+  color: #000; /* You might need to adjust the text color */
+}
+
+.status-done {
+  background-color: var(--status-done-color);
+  color: #000; /* You might need to adjust the text color */
+}
