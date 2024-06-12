@@ -1,14 +1,14 @@
 :root {
   --primary-color: #0a0a0a;
   --primary-color-hover: #343434;
-  --body-color: #363636;
+  --body-color: #ffffff;
   --accent-color: #b76d5e;
   --border-color: #ccc;
   --border-radius: 30px;
   --edit-color: #b7a95e;
-  --edit-color-hover:#d0c16b;
+  --edit-color-hover: #d0c16b;
   --delete-color: #c34949;
-  --delete-color-hover:#ec4b4b;
+  --delete-color-hover: #ec4b4b;
   --open-color: #636363;
   --open-color-hover: #737373;
   --low-priority-color: #00ac46;
@@ -23,6 +23,31 @@
   --button-color: #fff;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #ffffff;
+    --primary-color-hover: #dddddd;
+    --body-color: #363636;
+    --accent-color: #f08a5d;
+    --border-color: #444444;
+    --border-radius: 30px;
+    --edit-color: #b7a95e;
+    --edit-color-hover: #d0c16b;
+    --delete-color: #ff5f5f;
+    --delete-color-hover: #ff3333;
+    --open-color: #dddddd;
+    --open-color-hover: #cccccc;
+    --low-priority-color: #00ac46;
+    --medium-priority-color: #fdc500;
+    --high-priority-color: #dc0000;
+    --status-todo-color: #e3e2e0;
+    --bg-status-todo-color: #444444;
+    --status-doing-color: #d6e4ee;
+    --bg-status-doing-color: #444444;
+    --status-done-color: #deecdc;
+    --bg-status-done-color: #444444;
+  }
+}
 *,
 *::before,
 *::after {
@@ -40,12 +65,13 @@ html {
 }
 
 body {
+  background-color: var(--body-color);
   font-family: "Jersey 25", sans-serif;
   font-weight: 400;
   font-style: normal;
   font-size: 1.25rem;
   line-height: 1.4;
-  color: var(--body-color);
+  color: var(--primary-color);
 }
 h1,
 h2,
@@ -61,6 +87,7 @@ h2 {
   font-size: 2.5rem;
 }
 h3 {
+  color: #0a0a0a;
   font-size: 1.875rem;
   font-weight: 500;
 }
@@ -137,28 +164,28 @@ ul {
   width: 100%;
   display: inline-block;
 }
-.btn--edit{
+.btn--edit {
   background-color: var(--edit-color);
-  color:#0a0a0a;
+  color: #0a0a0a;
 }
 .btn--edit:hover,
-.btn--edit:focus{
+.btn--edit:focus {
   background-color: var(--edit-color-hover);
 }
-.btn--delete{
+.btn--delete {
   background-color: var(--delete-color);
-  color:#0a0a0a;
+  color: #0a0a0a;
 }
 .btn--delete:hover,
-.btn--delete:focus{
+.btn--delete:focus {
   background-color: var(--delete-color-hover);
 }
-.btn--open{
+.btn--open {
   background-color: var(--open-color);
   color: #ffffff;
 }
 .btn--open:hover,
-.btn--open:focus{
+.btn--open:focus {
   background-color: var(--open-color-hover);
   color: #ffffff;
 }
@@ -329,7 +356,7 @@ ul {
   align-items: center;
   min-height: 100vh;
   padding: 1rem;
-  gap:5rem;
+  gap: 5rem;
 }
 
 .form-signin {
@@ -387,12 +414,12 @@ ul {
   color: #666;
   flex-grow: 2;
 }
-.flex .btn{
+.flex .btn {
   font-size: 1rem;
 }
 /* Priority Colors */
 
-option{
+option {
   font-size: 1rem;
 }
 .low-priority {
