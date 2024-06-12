@@ -3,6 +3,8 @@ import { Story } from "../models/Story";
 import { ProjectManager } from "../services/ProjectService";
 import { LocalRepository } from "../api/ApiService";
 import { UserService } from "../services/UserService";
+import TaskForm from "./TaskForm";
+import "../index.css";
 
 interface StoryFormProps {
   project: {
@@ -18,25 +20,36 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Low");
   const [status, setStatus] = useState<"Todo" | "Doing" | "Done">("Todo");
   const [editStoryId, setEditStoryId] = useState<string | null>(null);
-  const [currentStory, setCurrentStory] = useState<Story | null>(null)
+  const [currentStoryId, setCurrentStory] = useState<Story | null>(null);
 
   useEffect(() => {
     refreshStoryList();
   }, []);
+
   const projectManager = new ProjectManager(new LocalRepository());
   const currentUser = UserService.getCurrentUser();
-
 
   const handleAddOrUpdateStory = (event: React.FormEvent) => {
     event.preventDefault();
 
     if (storyName && storyDescription && priority && status) {
       if (editStoryId) {
-        const updated = projectManager.updateStory(editStoryId, storyName, storyDescription, priority, status);
+        const updated = projectManager.updateStory(
+          editStoryId,
+          storyName,
+          storyDescription,
+          priority,
+          status
+        );
         console.log("Story updated: ", updated);
       } else {
-        projectManager.addStory(storyName, storyDescription, priority, status, currentUser?.id || "");
-        
+        projectManager.addStory(
+          storyName,
+          storyDescription,
+          priority,
+          status,
+          currentUser?.id || ""
+        );
       }
       setStoryName("");
       setStoryDescription("");
@@ -72,10 +85,11 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
       alert("Nie można usunąć story - story o podanym ID nie istnieje");
     }
   };
-  const handleOpenStory = (story: Story)=>{
+
+  const handleOpenStory = (story: Story) => {
     setCurrentStory(story);
-    projectManager.setCurrentProject(story.id);
-  }
+    projectManager.setCurrentStory(story.id);
+  };
 
   return (
     <>
@@ -111,9 +125,15 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
                   setPriority(e.target.value as "Low" | "Medium" | "High")
                 }
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
+                <option className="low-priority" value="Low">
+                  Low
+                </option>
+                <option className="medium-priority" value="Medium">
+                  Medium
+                </option>
+                <option className="high-priority" value="High">
+                  High
+                </option>
               </select>
             </div>
             <div className="form-group">
@@ -125,9 +145,15 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
                   setStatus(e.target.value as "Todo" | "Doing" | "Done")
                 }
               >
-                <option value="Todo">Todo</option>
-                <option value="Doing">Doing</option>
-                <option value="Done">Done</option>
+                <option className="status-todo" value="Todo">
+                  Todo
+                </option>
+                <option className="status-doing" value="Doing">
+                  Doing
+                </option>
+                <option className="status-done" value="Done">
+                  Done
+                </option>
               </select>
             </div>
             <button className="btn btn--accent btn--form" type="submit">
@@ -141,8 +167,8 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
             <div key={story.id} className="flex">
               <h3>{story.name}</h3>
               <p>{story.description}</p>
-              <p>Priority: {story.priority}</p>
-              <p>Status: {story.status}</p>
+              <p>Priority:<span className={`btn ${story.priority.toLowerCase()}-priority`}>{story.priority}</span> </p>
+              <p>Status: <span className={`btn status-${story.status.toLowerCase()}`}>{story.status}</span></p>
               <p>User: {story.ownerId}</p>
               <button
                 className="btn btn--edit"
@@ -158,7 +184,7 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
               </button>
               <button
                 className="btn btn--open"
-                onClick={() => handleOpenStory(story)} 
+                onClick={() => handleOpenStory(story)}
               >
                 Open
               </button>
@@ -166,7 +192,7 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
           ))}
         </div>
       </section>
-      {currentStory}
+      {currentStoryId && <TaskForm story={currentStoryId} />}
     </>
   );
 };
