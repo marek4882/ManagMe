@@ -1,7 +1,7 @@
-import { LocalRepository, Repository } from "../api/ApiService";
+import { Repository } from "../api/ApiService";
 import { Project } from "../models/Project";
-import { Story } from "../models/Story";
 import { v4 as uuid } from "uuid";
+import { Story } from "../models/Story";
 import { Task } from "../models/Task";
 
 export class ProjectManager {
@@ -45,10 +45,10 @@ export class ProjectManager {
 
   public deleteProject(id: string): boolean {
     const projects = this.repository.readProjects();
-    const initialLength = projects.length;
-    const updatedProjects = projects.filter((project) => project.id !== id);
-    if (updatedProjects.length !== initialLength) {
-      this.repository.saveProjects(updatedProjects);
+    const index = projects.findIndex((project) => project.id === id);
+    if (index !== -1) {
+      projects.splice(index, 1);
+      this.repository.saveProjects(projects);
       return true;
     }
     return false;
@@ -58,16 +58,13 @@ export class ProjectManager {
     this.repository.setCurrentProject(id);
   }
 
-  public getCurrentProject(): Project | null {
-    const currentProjectId = this.repository.getCurrentProjectId();
-    if (currentProjectId) {
-      return (
-        this.repository
-          .readProjects()
-          .find((project) => project.id === currentProjectId) || null
-      );
-    }
-    return null;
+  public getCurrentProjectId(): string | null {
+    return this.repository.getCurrentProjectId();
+  }
+  public getProjectName(projectId: string): string {
+    const projects = this.readProjects();
+    const project = projects.find((project) => project.id === projectId);
+    return project ? project.name : "Unknown Project";
   }
 
   // Story Management Methods
@@ -84,20 +81,19 @@ export class ProjectManager {
       name,
       description,
       priority,
-      projectId: this.repository.getCurrentProjectId() || "",
-      creationDate: new Date(),
       status,
       ownerId,
+      projectId: this.getCurrentProjectId() || "",
+      creationDate: new Date(),
     };
     stories.push(story);
-    console.log(stories);
     this.repository.saveStories(stories);
   }
 
   public readStories(): Story[] {
-    return this.repository
-      .readStories()
-      .filter((story) => story.projectId === this.getCurrentProject()?.id);
+    const stories = this.repository.readStories();
+    const currentProjectId = this.getCurrentProjectId();
+    return stories.filter((story) => story.projectId === currentProjectId);
   }
 
   public updateStory(
@@ -122,10 +118,10 @@ export class ProjectManager {
 
   public deleteStory(id: string): boolean {
     const stories = this.repository.readStories();
-    const initialLength = stories.length;
-    const updatedStories = stories.filter((story) => story.id !== id);
-    if (updatedStories.length !== initialLength) {
-      this.repository.saveStories(updatedStories);
+    const index = stories.findIndex((story) => story.id === id);
+    if (index !== -1) {
+      stories.splice(index, 1);
+      this.repository.saveStories(stories);
       return true;
     }
     return false;
@@ -133,26 +129,23 @@ export class ProjectManager {
   public setCurrentStory(id: string): void {
     this.repository.setCurrentStory(id);
   }
-  public getCurrentStory(): Story | null {
-    const currentStoryId = this.repository.getCurrentStoryId();
-    if (currentStoryId) {
-      return (
-        this.repository
-          .readStories()
-          .find((story) => story.id === currentStoryId) || null
-      );
-    }
-    return null;
-  }
-  // Task
 
+  public getCurrentStoryId(): string | null {
+    return this.repository.getCurrentStoryId();
+  }
+  public getStoryName(storyId: string): string {
+    const stories = this.readStories();
+    const story = stories.find((story) => story.id === storyId);
+    return story ? story.name : "Unknown Story";
+  }
+  // Task Management Methods
   public addTask(
     name: string,
     description: string,
     priority: "Low" | "Medium" | "High",
     state: "Todo" | "Doing" | "Done",
     estimatedTime: number,
-    userId: string
+    assigneeId: string
   ): void {
     const tasks = this.repository.readTasks();
     const task: Task = {
@@ -165,7 +158,7 @@ export class ProjectManager {
       state,
       startDate: new Date(),
       endDate: new Date(),
-      userId,
+      assigneeId,
     };
     tasks.push(task);
     console.log(task);
@@ -173,14 +166,9 @@ export class ProjectManager {
   }
 
   public readTasks(): Task[] {
-    return this.repository
-      .readTasks()
-      .filter((task) => task.storyId === this.getCurrentStory()?.id);
-  }
-
-  public readTask(id: string): Task | null {
     const tasks = this.repository.readTasks();
-    return tasks.find((task) => task.id === id) || null;
+    const currentStoryId = this.getCurrentStoryId();
+    return tasks.filter((task) => task.storyId === currentStoryId);
   }
 
   public updateTask(
@@ -188,7 +176,8 @@ export class ProjectManager {
     newName: string,
     newDescription: string,
     newPriority: "Low" | "Medium" | "High",
-    newState: "Todo" | "Doing" | "Done"
+    newState: "Todo" | "Doing" | "Done",
+    newAssignee: string
   ): boolean {
     const tasks = this.repository.readTasks();
     const index = tasks.findIndex((task) => task.id === id);
@@ -197,6 +186,10 @@ export class ProjectManager {
       tasks[index].description = newDescription;
       tasks[index].priority = newPriority;
       tasks[index].state = newState;
+      tasks[index].assigneeId = newAssignee;
+      if (newState === "Done") {
+        tasks[index].endDate = new Date();
+      }
       this.repository.saveTasks(tasks);
       return true;
     }
@@ -216,14 +209,8 @@ export class ProjectManager {
   public setCurrentTask(id: string): void {
     this.repository.setCurrentTask(id);
   }
-  public getCurrentTask(): Task | null {
-    const currentTaskId = this.repository.getCurrentTaskId();
-    if (currentTaskId) {
-      return (
-        this.repository.readTasks().find((task) => task.id === currentTaskId) ||
-        null
-      );
-    }
-    return null;
+
+  public getCurrentTaskId(): string | null {
+    return this.repository.getCurrentTaskId();
   }
 }
