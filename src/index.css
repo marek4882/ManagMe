@@ -138,7 +138,14 @@ ul {
   outline: 0;
   border-radius: 30px;
 }
-
+.btn--action-flex {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.btn--small {
+  font-size: 1rem;
+  padding: 0.4rem 2vw;
+}
 .btn--accent {
   background-color: var(--accent-color);
   color: #fff;
@@ -354,7 +361,6 @@ ul {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 1rem;
   gap: 5rem;
 }
@@ -440,15 +446,40 @@ option {
 /* Status Colors */
 .status-todo {
   background-color: var(--status-todo-color);
-  color: #000000; /* You might need to adjust the text color */
+  color: #000000;
 }
 
 .status-doing {
   background-color: var(--status-doing-color);
-  color: #000; /* You might need to adjust the text color */
+  color: #000;
 }
 
 .status-done {
   background-color: var(--status-done-color);
-  color: #000; /* You might need to adjust the text color */
+  color: #000;
+}
+
+/* Kanban */
+.kanban-board {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.kanban-column {
+  flex: 1;
+  margin: 0 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.kanban-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
 }
