@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { LocalRepository } from "../api/ApiService";
 import { Project } from "../models/Project";
 import { ProjectManager } from "../services/ProjectService";
-import { LocalRepository } from "../api/ApiService";
-import StoryForm from "./StoryForm";
+import { useNavigate } from "react-router-dom";
 
 const ProjectForm: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [editProjectId, setEditProjectId] = useState<string | null>(null);
-  const [currentProject, setCurrentProject] = useState<Project | null>(null); 
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     refreshProjectList();
@@ -22,7 +23,11 @@ const ProjectForm: React.FC = () => {
 
     if (projectName && projectDescription) {
       if (editProjectId) {
-        projectManager.updateProject(editProjectId, projectName, projectDescription);
+        projectManager.updateProject(
+          editProjectId,
+          projectName,
+          projectDescription
+        );
       } else {
         projectManager.addProject(projectName, projectDescription);
       }
@@ -56,13 +61,16 @@ const ProjectForm: React.FC = () => {
     }
   };
 
-  const handleOpenProject = (project: Project) => {
-    setCurrentProject(project);
-    projectManager.setCurrentProject(project.id);
+  const handleOpenProject = (id: string) => {
+    projectManager.setCurrentProject(id);
+    navigate(`/project/${id}/story`);
   };
 
   return (
     <>
+      <button className="btn" onClick={() => navigate(-1)}>
+        Back
+      </button>
       <section className="block grid container">
         <section className="form-container">
           <form className="form-signin" onSubmit={handleAddOrUpdateProject}>
@@ -118,7 +126,7 @@ const ProjectForm: React.FC = () => {
               </button>
               <button
                 className="btn btn--open"
-                onClick={() => handleOpenProject(project)} 
+                onClick={() => handleOpenProject(project.id)}
               >
                 Open
               </button>
@@ -126,7 +134,6 @@ const ProjectForm: React.FC = () => {
           ))}
         </div>
       </section>
-      {currentProject && <StoryForm project={currentProject} />}
     </>
   );
 };
