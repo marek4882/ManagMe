@@ -1,5 +1,3 @@
-import React from "react";
-import style from "../index.css";
 import Button from "./Button";
 
 function NavBar() {
