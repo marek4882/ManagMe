@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { Story } from "../models/Story";
+import { useNavigate, useParams } from "react-router-dom";
 import { ProjectManager } from "../services/ProjectService";
 import { LocalRepository } from "../api/ApiService";
 import { UserService } from "../services/UserService";
-import TaskForm from "./TaskForm";
-import "../index.css";
+import { Story } from "../models/Story";
 
-interface StoryFormProps {
-  project: {
-    id: string;
-    name: string;
-  };
-}
-
-const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
+const StoryForm: React.FC = () => {
+  const { projectId } = useParams<{ projectId: string }>();
   const [stories, setStories] = useState<Story[]>([]);
   const [storyName, setStoryName] = useState("");
   const [storyDescription, setStoryDescription] = useState("");
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">("Low");
   const [status, setStatus] = useState<"Todo" | "Doing" | "Done">("Todo");
   const [editStoryId, setEditStoryId] = useState<string | null>(null);
-  const [currentStoryId, setCurrentStory] = useState<Story | null>(null);
+  const [projectName, setProjectName] = useState<string>("");
 
-  useEffect(() => {
-    refreshStoryList();
-  }, []);
-
+  const navigate = useNavigate();
   const projectManager = new ProjectManager(new LocalRepository());
   const currentUser = UserService.getCurrentUser();
+
+  useEffect(() => {
+    if (projectId) {
+      projectManager.setCurrentProject(projectId);
+      refreshStoryList();
+      const name = projectManager.getProjectName(projectId);
+      setProjectName(name);
+    }
+  }, [projectId]);
 
   const handleAddOrUpdateStory = (event: React.FormEvent) => {
     event.preventDefault();
@@ -82,21 +81,66 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
     if (deleted) {
       refreshStoryList();
     } else {
-      alert("Nie można usunąć story - story o podanym ID nie istnieje");
+      alert("Unable to delete story - story with the given ID does not exist.");
     }
   };
 
-  const handleOpenStory = (story: Story) => {
-    setCurrentStory(story);
-    projectManager.setCurrentStory(story.id);
+  const handleOpenStory = (id: string) => {
+    projectManager.setCurrentStory(id);
+    navigate(`/story/${id}/task`);
   };
+
+  const renderStory = (story: Story) => (
+    <div key={story.id} className="kanban-item">
+      <h3>Name: {story.name}</h3>
+      <p>Description: {story.description}</p>
+      <p>
+        Priority:
+        <span
+          className={`btn ${story.priority.toLowerCase()}-priority btn--small`}
+        >
+          {story.priority}
+        </span>
+      </p>
+      <p>
+        Status:
+        <span className={`btn status-${story.status.toLowerCase()} btn--small`}>
+          {story.status}
+        </span>
+      </p>
+      <div className="flex">
+        <button
+          className="btn btn--edit"
+          onClick={() => handleEditStory(story.id)}
+        >
+          Edit
+        </button>
+
+        <button
+          className="btn btn--delete"
+          onClick={() => handleDeleteStory(story.id)}
+        >
+          Delete
+        </button>
+        <button
+          className="btn btn--open"
+          onClick={() => handleOpenStory(story.id)}
+        >
+          Open
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <>
+      <button className="btn" onClick={() => navigate(-1)}>
+        Back
+      </button>
       <section className="block grid container">
         <section className="form-container">
           <form className="form-signin" onSubmit={handleAddOrUpdateStory}>
-            <h1>Add Story</h1>
+            <h1>{editStoryId ? "Edit Story" : "Add Story"}</h1>
             <div className="form-group">
               <input
                 className="form-control"
@@ -161,50 +205,28 @@ const StoryForm: React.FC<StoryFormProps> = ({ project }) => {
             </button>
           </form>
         </section>
-        <div className="story-list">
-          <h2>Stories from project: {project.name}</h2>
-          {stories.map((story) => (
-            <div key={story.id} className="flex">
-              <h3>{story.name}</h3>
-              <p>{story.description}</p>
-              <p>
-                Priority:
-                <span
-                  className={`btn ${story.priority.toLowerCase()}-priority`}
-                >
-                  {story.priority}
-                </span>{" "}
-              </p>
-              <p>
-                Status:{" "}
-                <span className={`btn status-${story.status.toLowerCase()}`}>
-                  {story.status}
-                </span>
-              </p>
-              <p>User: {story.ownerId}</p>
-              <button
-                className="btn btn--edit"
-                onClick={() => handleEditStory(story.id)}
-              >
-                Edit
-              </button>
-              <button
-                className="btn btn--delete"
-                onClick={() => handleDeleteStory(story.id)}
-              >
-                Delete
-              </button>
-              <button
-                className="btn btn--open"
-                onClick={() => handleOpenStory(story)}
-              >
-                Open
-              </button>
-            </div>
-          ))}
+        <h2>Stories from project: {projectName}</h2>
+        <div className="kanban-board">
+          <div className="kanban-column status-todo">
+            <h2>Todo</h2>
+            {stories
+              .filter((story) => story.status === "Todo")
+              .map(renderStory)}
+          </div>
+          <div className="kanban-column status-doing">
+            <h2>Doing</h2>
+            {stories
+              .filter((story) => story.status === "Doing")
+              .map(renderStory)}
+          </div>
+          <div className="kanban-column status-done">
+            <h2>Done</h2>
+            {stories
+              .filter((story) => story.status === "Done")
+              .map(renderStory)}
+          </div>
         </div>
       </section>
-      {currentStoryId && <TaskForm story={currentStoryId} />}
     </>
   );
 };
